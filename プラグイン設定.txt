@@ -1,0 +1,59 @@
+==================================================
+■ プラグイン設定
+==================================================
+
+システムメニューもしくはウェブサイト/ブログで左メニュー「設定」内「プラグイン」
+
+==================================================
+■ プラグイン設定の作り方
+==================================================
+
+● config.yaml の設定
+
+● 設定画面テンプレートの指定(テンプレート名を同じものにしないこと)
+
+  - system_config_template: foo_config.tmpl
+  - blog_config_template: foo_config_blog.tmpl # ウェブサイトでも表示される
+
+● 設定できる値の指定
+
+  settings:
+      foo:
+          default: [デフォルト値]
+
+==================================================
+■ 取り出し方
+==================================================
+
+phpMyAdmin でデータ構造を確認
+
+  my $plugin = MT->component( 'TestPlugin' );
+  $plugin->get_config_value( 'foo' ); # システムレベル
+  $plugin->get_config_value( 'foo', 'system' ); # システムレベル
+  $plugin->get_config_value( 'foo', 'blog:' . $blog_id ); # ブログレベル
+
+==================================================
+■ ローカライズ
+==================================================
+
+● config.yaml の設定
+
+  l10n_lexicon:
+    en_us: l10n_en_us.yaml
+    ja: l10n_ja.yaml
+  
+● l10n_ja.yaml の内容
+
+    Foo: フー
+
+● プラグインでのローカライズ
+
+  my $plugin = MT->component( 'TestPlugin' );
+  $plugin->translate( 'Foo' );
+
+● テンプレートタグでのローカライズ
+
+  <__trans_section component="TestPlugin">
+      TestPlugin プラグインの内容でローカライズされる
+      <__trans phrase="Foo">
+  </__trans_section>

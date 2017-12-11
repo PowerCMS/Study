@@ -1,0 +1,83 @@
+■ 管理画面の操作
+
+● コールバックの種類
+
+- MT::App::CMS::template_source.cfg_prefs
+  - MTML ソースコードを正規表現による置換や入れ替えで変更する(通称 transform、ソースコードの変化に弱い)
+- MT::App::CMS::template_param.cfg_prefs
+  - MTML テンプレートを DOM 操作で変更する(推奨、アップデートに強い)
+- MT::App::CMS::template_output.cfg_prefs
+  - MTML テンプレートがビルドされたあとの HTML を操作する(奥の手)
+
+※ mt.cgi では MT::App::CMS だが、例えば mt-search.cgi であれば MT::App::Search になる
+※ MT::App::CMS を省略した場合、すべての CGI で動作する
+
+
+● MT::App::CMS::template_source.cfg_prefs
+
+    # プラグイン設定ファイルも対象にできる
+
+    my ( $cb, $app, $tmpl ) = @_;
+    $$tmpl =~ s/foo/bar/;
+
+
+● MT::App::CMS::template_param.cfg_prefs
+
+    # プラグイン設定ファイルは対象にできない
+
+    my ( $cb, $app, $param, $tmpl ) = @_;
+    # $param はテンプレート変数
+    # $tmpl はテンプレートオブジェクトのため、template_source における $tmpl とは異なる
+    if ( my $pointer_field = $tmpl->getElementById( 'description' ) ) { # <= DOM オブジェクト取得
+        my $nodeset = $tmpl->createElement( # <= app:setting タグを作成する
+            'app:setting',
+            {
+                id => 'foo',
+                label => $plugin->translate( 'Foo' ),
+                required => 0,
+            }
+        );
+        my $innerHTML = <<MTML; # <= app:setting タグの中身を組み立てる
+<input type="text" name="foo" id="foo" value="<mt:var name="foo" escape="html">" />
+MTML
+        $nodeset->innerHTML( $innerHTML ); # <= app:setting タグの中身としてセットする
+        $tmpl->insertAfter( $nodeset, $pointer_field ); # <= 取得したDOM オブジェクトのあとにセット
+    }
+
+
+● MT::App::CMS::template_output.cfg_prefs
+
+    # template_source と同じだと考えてよい
+
+    my ( $cb, $app, $tmpl ) = @_;
+    $$tmpl =~ s/foo/bar/;
+
+
+
+● コールバックの優先度
+
+同じプラグイン内では、yaml の配列順
+
+  cms_post_save.entry:
+    - handler: $testplugin::TestPlugin::_cb_cms_post_save_entry
+    - handler: $testplugin::TestPlugin::_cb_cms_post_save_entry2
+    - handler: $testplugin::TestPlugin::_cb_cms_post_save_entry3
+
+違うプラグインでは、priority で指定する
+
+  cms_post_save.entry:
+    - handler: $testplugin::TestPlugin::_cb_cms_post_save_entry
+      priority: 1
+    - handler: $testplugin::TestPlugin::_cb_cms_post_save_entry2
+      priority: 5
+    - handler: $testplugin::TestPlugin::_cb_cms_post_save_entry3
+      priority: 10
+
+  1 が早く、10 が遅い。指定しない場合は 5 扱いとなる。
+  ※ 0 と 11 もあるが、システム全体でひとつしか使えないので、よほどのことがないかぎり使わない
+
+● コールバックの探し方
+
+$ cd /path/to/mt;
+$ find . -type f -name "*.pm"|xargs grep 'run_callbacks'
+
