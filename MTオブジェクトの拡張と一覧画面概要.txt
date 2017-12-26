@@ -77,7 +77,7 @@ __PACKAGE__->install_properties( {
 
   ● 使い方
 
-    my $foo = MT->model( 'foo_obj' )->get_by_key(); # < object_types のキー
+    my $foo = MT->model( 'foo_obj' )->new(); # < object_types のキー
     $foo->blog_id( 1 );
     $foo->name( '名前' );
     $foo->text( 'テキスト' );
