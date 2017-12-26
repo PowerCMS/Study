@@ -2,7 +2,7 @@
 ■ データベース内テーブルの拡張
 ==================================================
 
-▼ 記事(mt_blog)に test_text1 カラムを追加する場合
+▼ 記事(mt_entry)に test_text1 カラムを追加する場合
 
   ● config.yaml の設定
 
@@ -21,7 +21,7 @@
 
   ● 使い方
 
-    $entry->test_meta1( 'test' );
+    $entry->test_text1( 'test' );
     $entry->save or die $entry->errstr();
 
 
@@ -45,7 +45,7 @@
 
   schema_version: 0.1
   object_types:
-      foo_obj: $testplugin::TestPlugin::Foo
+      foo_obj: TestPlugin::Foo
 
 ===========================================================
 package TestPlugin::Foo;
