@@ -47,6 +47,8 @@
   object_types:
       foo_obj: TestPlugin::Foo
 
+
+  - plugins/TestPlugin/lib/TestPlugin/Foo.pm を作成
 ===========================================================
 package TestPlugin::Foo;
 use strict;
