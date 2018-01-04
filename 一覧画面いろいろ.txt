@@ -1,0 +1,163 @@
+==================================================
+■ 一覧画面いろいろ
+==================================================
+
+表示とフィルタとソートを意識すること！
+
+▼ 基本の形
+
+list_properties:
+    entry:
+        test_text1:
+            label: Test Text1
+            auto: 1
+            order: 190
+
+- 「auto: 1」を指定すると、カラムの形等で判断してよしなにしてくれる。ラベルなど指定すれば、それらは上書きできる
+- 「base: __virtual.string」を指定すると、既存の string 型の指定が使われる。ラベルなど指定すれば、それらは上書きできる
+-- MT::Core を「list_properties」で grep する。様々な指定の仕方がここでわかる
+
+▼ 一覧に表示するかどうか
+
+  強制
+            display: force
+  強制ではないがデフォルトでは表示
+            display: default
+  強制ではなくデフォルトでは非表示
+            display: optional
+  非表示(フィルタでのみ使用する場合など)
+            display: none
+
+▼ 表示内容や形式を変更する
+
+            html: $testplugin::TestPlugin::Listing::_html_test_text1
+
+sub _html_test_text1 {
+    my ( $prop, $obj, $app ) = @_;
+    return 99;
+}
+
+sub _html_test_text1 {
+    my ( $prop, $obj, $app ) = @_;
+    return MT::Util::encode_html( $obj->test_text1 );
+}
+
+sub _html_test_text1 {
+    my ( $prop, $obj, $app ) = @_;
+    if ( $obj->test_text1 ) {
+        return MT::Util::encode_html( $obj->test_text1 );
+    } else {
+        return '';
+    }
+}
+
+▼ フィルタ条件を操作する
+
+操作ユーザの権限によって変わる場合など
+
+            terms: $testplugin::TestPlugin::Listing::_terms_test_text1
+
+sub _terms_test_text1 {
+    my ( $prop, $args, $db_terms, $db_args ) = @_;
+    # MT->log( 'args: ' . MT::Util::YAML::Dump( $args ) );
+    # MT->log( 'db_terms: ' . MT::Util::YAML::Dump( $db_terms ) );
+    # MT->log( 'db_args: ' . MT::Util::YAML::Dump( $db_args ) );
+    # 権限によって変わることがあるので要注意
+    $db_terms->{ test_text1 } = 'foo';
+}
+
+sub _terms_test_text1 {
+    my ( $prop, $args, $db_terms, $db_args ) = @_;
+    my $app = MT->instance();
+    if ( $app->user->is_superuser() ) {
+        $db_terms->{ test_text1 } = 'foo';
+    } else {
+        $db_terms->{ test_text1 } = 'bar';
+    }
+}
+
+※ ?blog_id=0&__mode=list&_type=entry&blog_id=7&filter=test_text1&filter_val=foo で直接アクセスできる(左メニューに指定することも可能)
+※ 組み合わせれば○○かつ☓☓のような指定もできる
+※ terms を変更する場合は、飛んでいるパラメータの形と引数の形を確認すること
+
+▼ フィルタ条件を選択形式にする
+
+            html: $testplugin::TestPlugin::Listing::_html_test_text1
+            base: __virtual.single_select
+            single_select_options:
+                -
+                    label: フー
+                    value: foo
+                -
+                    label: バー
+                    value: bar
+                -
+                    label: バズ
+                    value: buz
+
+※ 注意点
+- https://movabletype.atlassian.net/browse/MTC-9745
+- https://movabletype.atlassian.net/browse/MTC-9605
+
+▼ 他のプロパティの指定をベースにする
+
+    page:
+        test_text1:
+            base: entry.test_text1
+            label: Test Text1(Page)
+
+▼ 動的な指定の仕方
+
+            single_select_options: $testplugin::TestPlugin::Listing::_single_select_options_test_text1
+
+sub _single_select_options_test_text1 {
+    return [
+        {
+            label => 'フー',
+            value => 'foo',
+        }, {
+            label => 'バー',
+            value => 'bar',
+        }, {
+            label => 'バズ',
+            value => 'buz',
+        },
+    ];
+}
+
+
+▼ フィルタで使えないようにする
+
+            filter_editable: 0
+
+
+▼ その他
+
+指定できる値・内容とも他にもいろいろある。各オブジェクトの list_props に書いてある
+
+- MT::Blog::list_props
+- MT::Entry::list_props
+- MT::Comment::list_props
+
+など
+
+0、空、NULL への対処を考慮すること
+bulk_sort は最後の手段
+
+▼ クイックフィルタの追加
+
+system_filters:
+    entry:
+        test_text1_is_foo:
+            label: Test Text1 is foo
+            items:
+                -
+                    type: test_text1
+                    args:
+                        option: equal
+                        value: foo
+            order: 99999
+
+※ ?blog_id=0&__mode=list&_type=entry&blog_id=7&filter_key=test_text1_is_foo で直接アクセスできる(左メニューに指定することも可能)
+※ system_filters はデバッグしづらいので、難しければコールバック cms_pre_load_filtered_list.entry でパラメータ fid で $terms や $args を操作するほうがぶっちゃけ簡単
+
