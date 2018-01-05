@@ -1,21 +1,27 @@
-基本的には、他の人に見てもらえる環境を使うこと
-  - AWS デモ環境
-  - Azure のサブスクリプション
+# 概要
 
-まずは、ツールコマンド
-  - SSH ログインする
-  - タスクを実行する
-    - Apache で実行
-  - システムログを確認
+基本的には、他の人に見てもらえる環境を使うこと
+
+* AWS デモ環境
+* Azure のサブスクリプション
+
+ツールコマンドの実行
+
+* SSH ログインする
+* タスクを実行する
+    * Apache で実行
+* システムログを確認
 
 サンプルツール
-  - https://github.com/PowerCMS/PowerCMS/blob/develop/powercms/tools/sample-tool
-  - デバッグの仕方
-    - システムログ
-      - MT->log( 'test' );
-    - 変数のダンプ
-      use Data::Dumper; Dumper( $obj );
-      MT::Util::YAML::Dump( $hash );
+* https://github.com/PowerCMS/PowerCMS/blob/develop/powercms/tools/sample-tool
+
+デバッグの仕方
+
+* システムログ
+    * `MT->log( 'test' );`
+* 変数のダンプ
+    * `use Data::Dumper; Dumper( $obj );`
+    * `MT::Util::YAML::Dump( $hash );`
 
 # MT オブジェクトについて
 
@@ -23,7 +29,21 @@
 
 ```
 my $entry = MT->model( 'entry' )->load( $terms, $args );
-my $entry = MT->model( 'entry' )->load( { id => 1 } );
+```
+
+```
+my $entry = MT->model( 'entry' )->load(
+    {
+        authored_on => {
+            op => '>',
+            value => '20171231000000',
+        },
+    }, {
+        sort => 'id',
+        direction => 'descend',
+        limit => 10,
+    },
+);
 ```
 
 ## $terms
