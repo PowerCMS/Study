@@ -1,6 +1,6 @@
 # データベース内テーブルの拡張
 
-## 記事( `mt_entry` )に `test_text1` カラムを追加する場合
+## 記事( `mt_entry` )に `entry_test_text1` カラムを追加する場合
 
 ```
 # config.yaml
