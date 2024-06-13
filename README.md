@@ -96,6 +96,27 @@ Movable Type でレジストリ定義されていることは概ねできます�
 プラグインでは、どのコールバックを使って、何の処理をする、の形で config.yaml に定義します。下記をあわせて参照してください。
 - https://github.com/PowerCMS/Study/blob/master/%E3%82%B3%E3%83%BC%E3%83%AB%E3%83%90%E3%83%83%E3%82%AF%E3%81%AB%E3%82%88%E3%82%8B%E7%AE%A1%E7%90%86%E7%94%BB%E9%9D%A2%E6%93%8D%E4%BD%9C.md
 
+# プラグインの構成
+
+```
+└ plugins/
+  └ SamplePlugin/
+    └ config.yaml
+    └ lib/ # 静的出力でのハンドラ処理が記述された Perl モジュールを格納する
+      └ SamplePlugin/
+        └ Tags.pm
+    └ php/ # DynamicMTML でのハンドラ処理が記述された php ファイルを格納する
+      └ function.mtsample.php
+    └ tmpl/ # プラグイン設定画面その他、各機能が利用するテンプレート
+      └ sample_plugin_config.pm
+└ mt-static/
+  └ plugins/
+    └ SamplePlugin/ # プラグインが静的ファイルを持っている場合は mt-static 以下に置く
+      └ css/
+      └ js/
+      └ images/
+```
+
 # プラグイン開発時の注意点
 
 - 既存の処理で、類似の機能がないか探し、あれば参考にするようにしてください。
