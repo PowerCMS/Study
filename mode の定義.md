@@ -24,6 +24,8 @@ sub _mode_sample_methods {
 ```
 ## SamplePlugin::CMS
 sub _mode_sample_methods {
+    my $app = MT->instance();
+
     # ここで必要な処理を実行
 
     # 実行結果を表示
