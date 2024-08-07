@@ -27,6 +27,8 @@
 
 * https://github.com/movabletype/Documentation/wiki/Japanese-plugin-dev-3-4
 
+## 既存データの読み込み
+
 ```
 my $entry = MT->model( 'entry' )->load( $terms, $args );
 ```
@@ -46,7 +48,7 @@ my $entry = MT->model( 'entry' )->load(
 );
 ```
 
-## $terms
+### $terms
 
 ダイレクトな条件指定
 
@@ -59,7 +61,8 @@ my $entry = MT->model( 'entry' )->load(
 * `foo => ['201103010000', '201104010000']`
     * foo カラムの値が 201103010000 以上 201104010000 以下
     * 合わせて args で range_incl の指定が必要
-## $args
+
+### $args
 
 オプション指定
 
@@ -72,7 +75,7 @@ my $entry = MT->model( 'entry' )->load(
 * `join`
     * 連結
 
-## カラムの値の出力
+### カラムの値の出力
 
 ```
 $entry->title;
@@ -84,4 +87,17 @@ phpMyAdmin 等でデータの構造を把握しておくこと
 ```
 my $field_name = 'field.foo';
 $entry->$field_name;
+```
+
+## 新しいデータの作成
+
+new してデータを入れて save
+
+```
+my $notification = MT->model( 'notification' )->new();
+$notification->blog_id( $blog_id );
+$notification->name( 'foo' );
+$notification->email( 'test@example.com' );
+$notification->url( 'http://example.com/' );
+$notification->save or die $notification->errstr;
 ```
