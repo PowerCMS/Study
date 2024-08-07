@@ -1,0 +1,32 @@
+# コールバックとは
+
+本体の動作の中で、特定のタイミングで処理を挟み込むための仕組み。管理画面で表示されるテンプレートを変更したり、オブジェクトの保存に際してデータを補正するなどの目的で使われる。
+呼び出されるタイミングは本体のプログラムの中で決まっており、後述の方法で調べることができる。
+
+# config.yaml
+
+呼び出されるタイミングと、ハンドラとして呼び出されたときに実行する処理を指定する。
+
+```
+callbacks:
+  cms_post_save.entry: $sampleplugin::SamplePlugin::Plugin::_cb_cms_post_save_entry
+```
+
+```
+sub _cb_cms_post_save_entry {
+  my ( $cb, $app, $obj, $original ) = @_;
+  # 第一引数は決まっている。第二引数以降は後述の run_callbacks の第二引数以降がそのまま渡される。
+}
+```
+
+# コールバックの見つけ方
+
+run_callbacks を検索する
+
+```
+$ find . -type f -name "*.pm"|xargs grep '>run_callbacks'
+./addons/Commercial.pack/lib/CustomFields/DataAPI/Endpoint/v2/Field.pm:    $app->run_callbacks( 'data_api_post_delete.field', $app, $field );
+./addons/Community.pack/lib/MT/App/Community.pm:    my $filter_result = $app->run_callbacks( 'api_save_filter.author', $app );
+./addons/Community.pack/lib/MT/App/Community.pm:    $app->run_callbacks( 'api_post_save.author', $app, $user, $original );
+```
+
