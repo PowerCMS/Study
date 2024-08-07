@@ -85,24 +85,3 @@ phpMyAdmin 等でデータの構造を把握しておくこと
 my $field_name = 'field.foo';
 $entry->$field_name;
 ```
-
-# プラグインの形
-
-## config.yaml
-
-## コールバックの指定
-
-`cms_post_save.entry`
-
-### パラメータの取得
-
-```
-my $app = MT->instance();
-$app->param( 'foo' );
-```
-
-### 環境変数の取得
-
-```
-MT->config->foo;
-```
